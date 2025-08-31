@@ -80,29 +80,6 @@ public class BikeAPIController : ControllerBase
             .Take(5)
             .ToListAsync();
 
-        /*var station = await _context.Stations
-            .Where(data => data.Id == id)
-            .Select(data => new
-            {
-                data.Id,
-                data.Name,
-                DepartureStationId = _context.Journeys
-                    .Where(j => j.Departure_station_id == id)
-                    .ToList(),
-                JourneyCount = _context.Journeys.Count(j => j.Departure_station_id == id),
-                DepartureStationCount = _context.Journeys.Count(j => j.Departure_station_id == id),
-                ReturnStationCount = _context.Journeys.Count(j => j.Return_station_id == id),
-                AverageDistance = Math.Round(_context.Journeys
-                    .Where(j => j.Departure_station_id == id || j.Return_station_id == id)
-                    .Average(j => j.Covered_distance_m) / 1000.0, 2 // Convert to kilometers
-            )
-            })
-            .FirstOrDefaultAsync();
-
-        if (station == null)
-        {
-            return NotFound();
-        }*/
 
         return Ok(new
         {
@@ -139,3 +116,26 @@ public class BikeAPIController : ControllerBase
     }
 
 }
+/*var station = await _context.Stations
+            .Where(data => data.Id == id)
+            .Select(data => new
+            {
+                data.Id,
+                data.Name,
+                DepartureStationId = _context.Journeys
+                    .Where(j => j.Departure_station_id == id)
+                    .ToList(),
+                JourneyCount = _context.Journeys.Count(j => j.Departure_station_id == id),
+                DepartureStationCount = _context.Journeys.Count(j => j.Departure_station_id == id),
+                ReturnStationCount = _context.Journeys.Count(j => j.Return_station_id == id),
+                AverageDistance = Math.Round(_context.Journeys
+                    .Where(j => j.Departure_station_id == id || j.Return_station_id == id)
+                    .Average(j => j.Covered_distance_m) / 1000.0, 2 // Convert to kilometers
+            )
+            })
+            .FirstOrDefaultAsync();
+
+        if (station == null)
+        {
+            return NotFound();
+        }*/
