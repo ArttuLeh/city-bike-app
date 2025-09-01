@@ -100,9 +100,6 @@ public class BikeAPIController : ControllerBase
     [HttpGet("journeys")]
     public async Task<ActionResult<IEnumerable<Journey>>> GetJourneys(int page = 1, int pageSize = 10)
     {
-        bool hasPreviousPage = page > 1;
-        bool hasNextPage = (page * pageSize) < await _context.Journeys.CountAsync();
-
         if (page < 1) page = 1;
         if (pageSize < 1) pageSize = 10;
 
