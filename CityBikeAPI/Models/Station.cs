@@ -14,7 +14,7 @@ public class Station
     public string? Address { get; set; }
     public string? Town { get; set; }
     public string? Operator { get; set; }
-    public int Capasity { get; set; }
+    public int Capacity { get; set; }
     public double X { get; set; }
     public double Y { get; set; }
 
