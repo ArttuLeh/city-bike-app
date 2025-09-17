@@ -1,0 +1,26 @@
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Departure Station Name</th>
+            <th>Return Station ID</th>
+            <th>Return Station Name</th>
+            <th>Covered Distance (m)</th>
+            <th>Duration (s)</th>
+        </tr>
+    </thead>
+    @for (journey of journeys(); track journey.id)
+    {
+        <tbody>
+            <tr>
+                <td>{{ journey.id }}</td>
+                <td>{{ journey.departure_station_name }}</td>
+                <td>{{ journey.return_station_id }}</td>
+                <td>{{ journey.return_station_name }}</td>
+                <td>{{ journey.covered_distance_m }}</td>
+                <td>{{ journey.duration_sec }}</td>
+            </tr>
+        </tbody>
+    }
+</table>
+
