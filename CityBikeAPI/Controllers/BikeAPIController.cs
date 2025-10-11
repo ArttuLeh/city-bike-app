@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CityBikeAPI.Data;
 using CityBikeAPI.Models;
-using System.Security.Cryptography.X509Certificates;
 
 namespace CityBikeAPI.Controllers;
 
@@ -21,17 +20,51 @@ public class BikeAPIController : ControllerBase
 
     //GET: /api/stations
     [HttpGet("stations")]
-    public async Task<ActionResult<IEnumerable<Station>>> GetStations()
+    public async Task<ActionResult<IEnumerable<Station>>> GetStations(int? page, string search = "")
     {
-        var stations = await _context.Stations.ToListAsync();
-        return Ok(stations);
+        int pageSize = 40;
+        int currentPage = page ?? 1;
+        if (pageSize < 40) pageSize = 40;
+
+        IQueryable<Station> query = _context.Stations;
+
+        search = search.ToLower();
+
+        var totalCount = await query.CountAsync();
+
+        if (string.IsNullOrEmpty(search))
+        {
+            var data = await query
+                .Skip((currentPage - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return Ok(new
+            {
+                currentPage,
+                pageSize,
+                totalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+                data
+            });
+        }
+        else
+        {
+            var data = await query
+            .Where(station => station.Name != null && station.Name.ToLower().Contains(search))
+            .ToListAsync();
+
+            return Ok(new { data });
+        }
+
     }
 
     //GET: /api/station/{id}
     [HttpGet("stations/{id}")]
     public async Task<ActionResult<IEnumerable<Station>>> GetStation(int id)
     {
+        IQueryable<Station> query = _context.Stations;
         var data = await _context.Stations.FindAsync(id);
+
         if (data == null)
         {
             return NotFound();
@@ -84,12 +117,12 @@ public class BikeAPIController : ControllerBase
 
         return Ok(new
         {
-            data.Id,
-            data.Name,
+            success = true,
+            data,
             departureStationCount,
             returnStationCount,
-            avgDepartureDistance = Math.Round(avgDepartureDistance / 1000.0, 2), // Convert to kilometers
-            avgReturnDistance = Math.Round(avgReturnDistance / 1000.0, 2), // Convert to kilometers
+            avgDepartureStationDistance = Math.Round(avgDepartureDistance / 1000.0, 2), // Convert to kilometers
+            avgReturnStationDistance = Math.Round(avgReturnDistance / 1000.0, 2), // Convert to kilometers
             popularReturnStations,
             popularDepartureStations,
         });
@@ -98,22 +131,104 @@ public class BikeAPIController : ControllerBase
 
     //GET: /api/jorneys
     [HttpGet("journeys")]
-    public async Task<ActionResult<IEnumerable<Journey>>> GetJourneys(int page = 1, int pageSize = 10)
+    public async Task<ActionResult<IEnumerable<Journey>>> GetJourneys(
+        int? page, string search = "", string sortField = "", string sortOrder = "")
     {
-        if (page < 1) page = 1;
-        if (pageSize < 1) pageSize = 10;
+        int pageSize = 40;
+        int currentPage = page ?? 1;
+        if (pageSize < 40) pageSize = 40;
 
+        IQueryable<Journey> query = _context.Journeys;
 
-        var journeys = await _context.Journeys
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
+        search = search.ToLower();
 
-        return Ok(journeys);
+        var totalCount = await query.CountAsync();
+
+        if (!string.IsNullOrEmpty(sortField))
+        {
+            switch (sortField.ToLower())
+            {
+                case "departure_station_id":
+                    query = sortOrder == "asc"
+                        ? query.OrderBy(j => j.Departure_station_id)
+                        : query.OrderByDescending(j => j.Departure_station_id);
+                    break;
+                case "departure_station_name":
+                    query = sortOrder == "asc"
+                        ? query.OrderBy(j => j.Departure_station_name)
+                        : query.OrderByDescending(j => j.Departure_station_name);
+                    break;
+                case "return_station_name":
+                    query = sortOrder == "asc"
+                        ? query.OrderBy(j => j.Return_station_name)
+                        : query.OrderByDescending(j => j.Return_station_name);
+                    break;
+                case "covered_distance_m":
+                    query = sortOrder == "asc"
+                        ? query.OrderBy(j => j.Covered_distance_m)
+                        : query.OrderByDescending(j => j.Covered_distance_m);
+                    break;
+                case "duration_sec":
+                    query = sortOrder == "asc"
+                        ? query.OrderBy(j => j.Duration_sec)
+                        : query.OrderByDescending(j => j.Duration_sec);
+                    break;
+                default:
+                    // Default sorting if unknown field
+                    query = query.OrderBy(j => j.Id);
+                    break;
+            }
+
+            var data = await query
+                .Skip((currentPage - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return Ok(new
+            {
+                currentPage,
+                pageSize,
+                totalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+                data
+            });
+        }
+        else if (string.IsNullOrEmpty(search))
+        {
+            var data = await query
+                .Skip((currentPage - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return Ok(new
+            {
+                currentPage,
+                pageSize,
+                totalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+                data
+            });
+        }
+        else
+        {
+            var data = await query
+                .Where(
+                    journey => journey.Departure_station_name != null &&
+                    journey.Departure_station_name.ToLower().Contains(search))
+                .Skip((currentPage - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return Ok(new
+            {
+                currentPage,
+                pageSize,
+                totalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+                data
+            });
+        }
     }
 
     //GET: /api/journey/{id}
-    [HttpGet("journeys/{id}")]
+    /*[HttpGet("journeys/{id}")]
     public async Task<ActionResult<IEnumerable<Journey>>> GetJourney(int id)
     {
         var journey = await _context.Journeys.FindAsync(id);
@@ -122,29 +237,6 @@ public class BikeAPIController : ControllerBase
             return NotFound();
         }
         return Ok(journey);
-    }
+    }*/
 
 }
-/*var station = await _context.Stations
-            .Where(data => data.Id == id)
-            .Select(data => new
-            {
-                data.Id,
-                data.Name,
-                DepartureStationId = _context.Journeys
-                    .Where(j => j.Departure_station_id == id)
-                    .ToList(),
-                JourneyCount = _context.Journeys.Count(j => j.Departure_station_id == id),
-                DepartureStationCount = _context.Journeys.Count(j => j.Departure_station_id == id),
-                ReturnStationCount = _context.Journeys.Count(j => j.Return_station_id == id),
-                AverageDistance = Math.Round(_context.Journeys
-                    .Where(j => j.Departure_station_id == id || j.Return_station_id == id)
-                    .Average(j => j.Covered_distance_m) / 1000.0, 2 // Convert to kilometers
-            )
-            })
-            .FirstOrDefaultAsync();
-
-        if (station == null)
-        {
-            return NotFound();
-        }*/
