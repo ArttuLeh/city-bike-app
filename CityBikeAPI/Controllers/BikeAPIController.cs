@@ -5,6 +5,7 @@ using CityBikeAPI.Models;
 
 namespace CityBikeAPI.Controllers;
 
+// API controller for CityBike data
 [ApiController]
 [Route("/api")]
 public class BikeAPIController : ControllerBase
@@ -12,6 +13,7 @@ public class BikeAPIController : ControllerBase
     private readonly ILogger<BikeAPIController> _logger;
     private readonly AppDbContext _context;
 
+    // Constructor with dependency injection for logger and database context
     public BikeAPIController(ILogger<BikeAPIController> logger, AppDbContext context)
     {
         _logger = logger;
@@ -19,6 +21,7 @@ public class BikeAPIController : ControllerBase
     }
 
     //GET: /api/stations
+    // Returns a paginated list of stations, with optional search by name
     [HttpGet("stations")]
     public async Task<ActionResult<IEnumerable<Station>>> GetStations(int? page, string search = "")
     {
@@ -34,6 +37,7 @@ public class BikeAPIController : ControllerBase
 
         if (string.IsNullOrEmpty(search))
         {
+            // No search: return paginated stations
             var data = await query
                 .Skip((currentPage - 1) * pageSize)
                 .Take(pageSize)
@@ -49,6 +53,7 @@ public class BikeAPIController : ControllerBase
         }
         else
         {
+            // Search: return all stations whose name contains the search string
             var data = await query
             .Where(station => station.Name != null && station.Name.ToLower().Contains(search))
             .ToListAsync();
@@ -59,6 +64,7 @@ public class BikeAPIController : ControllerBase
     }
 
     //GET: /api/station/{id}
+    // Returns detailed information about a single station, including statistics
     [HttpGet("stations/{id}")]
     public async Task<ActionResult<IEnumerable<Station>>> GetStation(int id)
     {
@@ -114,7 +120,7 @@ public class BikeAPIController : ControllerBase
             .Take(5)
             .ToListAsync();
 
-
+        // Return station info and statistics
         return Ok(new
         {
             success = true,
@@ -130,6 +136,7 @@ public class BikeAPIController : ControllerBase
 
 
     //GET: /api/jorneys
+    // Returns a paginated list of journeys, with optional search and sorting
     [HttpGet("journeys")]
     public async Task<ActionResult<IEnumerable<Journey>>> GetJourneys(
         int? page, string search = "", string sortField = "", string sortOrder = "")
@@ -148,6 +155,7 @@ public class BikeAPIController : ControllerBase
         {
             switch (sortField.ToLower())
             {
+                // Apply sorting based on the requested field and order
                 case "departure_station_id":
                     query = sortOrder == "asc"
                         ? query.OrderBy(j => j.Departure_station_id)
@@ -194,6 +202,7 @@ public class BikeAPIController : ControllerBase
         }
         else if (string.IsNullOrEmpty(search))
         {
+            // No search: return paginated journeys
             var data = await query
                 .Skip((currentPage - 1) * pageSize)
                 .Take(pageSize)
@@ -209,6 +218,7 @@ public class BikeAPIController : ControllerBase
         }
         else
         {
+            // Search: return journeys where departure station name contains the search string
             var data = await query
                 .Where(
                     journey => journey.Departure_station_name != null &&
@@ -226,17 +236,4 @@ public class BikeAPIController : ControllerBase
             });
         }
     }
-
-    //GET: /api/journey/{id}
-    /*[HttpGet("journeys/{id}")]
-    public async Task<ActionResult<IEnumerable<Journey>>> GetJourney(int id)
-    {
-        var journey = await _context.Journeys.FindAsync(id);
-        if (journey == null)
-        {
-            return NotFound();
-        }
-        return Ok(journey);
-    }*/
-
 }
