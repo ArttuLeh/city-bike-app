@@ -259,4 +259,72 @@ public class BikeAPIController : ControllerBase
             return StatusCode(500, new { error = "An error occurred while processing your request" });
         }
     }
+
+    //GET: /api/journey/{id}
+    // Returns detailed information about a single journey
+    [HttpGet("journeys/{id}")]
+    public async Task<ActionResult<IEnumerable<Journey>>> GetJourney(int id)
+    {
+        try
+        {
+            IQueryable<Journey> query = _context.Journeys;
+            var data = await _context.Journeys.FindAsync(id);
+
+            if (data == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(data);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while fetching journey");
+            return StatusCode(500, new { error = "An error occurred while processing your request" });
+        }
+    }
+
+    //POST: /api/journeys
+    // Adds a new journey to the database
+    [HttpPost("journeys")]
+    public async Task<ActionResult<Journey>> AddJourney([FromBody] Journey newJourney)
+    {
+        try
+        {
+            newJourney.Id = null; // Ensure the ID is null so that the database can generate it
+
+            _context.Journeys.Add(newJourney);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetJourneys), new { id = newJourney.Id }, newJourney);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while adding a new journey");
+            return StatusCode(500, new { error = "An error occurred while processing your request" });
+        }
+    }
+
+    // DELETE: /api/journeys/{id}
+    // Deletes a journey by ID
+    [HttpDelete("journeys/{id}")]
+    public async Task<IActionResult> DeleteJourney(int id)
+    {
+        try
+        {
+            var journey = await _context.Journeys.FindAsync(id);
+            if (journey == null)
+            {
+                return NotFound();
+            }
+            _context.Journeys.Remove(journey);
+            await _context.SaveChangesAsync();
+            return Ok("Journey deleted successfully");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while deleting journey with ID {JourneyId}", id);
+            return StatusCode(500, new { error = "An error occurred while processing your request" });
+        }
+    }
 }
