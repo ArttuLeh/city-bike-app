@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 using Microsoft.AspNetCore.WebUtilities;
 
@@ -7,6 +8,7 @@ namespace CityBikeAPI.Models;
 public class Journey
 {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int? Id { get; set; }
     public int Departure_station_id { get; set; }
     public string? Departure_station_name { get; set; }
