@@ -52,3 +52,5 @@ export interface StationDetails {
         journeyCount: number;
     }[];
 }
+
+export type JourneyFormValues = Omit<Journey, 'id'>;

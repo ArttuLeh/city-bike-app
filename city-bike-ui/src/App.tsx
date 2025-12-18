@@ -4,6 +4,7 @@ import { AppBar, Container, Toolbar, Button } from '@mui/material'
 import JourneysView from './components/JourneysView'
 import StationsView from './components/StationsView'
 import StationView from './components/StationView'
+import AddJourney from './components/AddJourney'
 import Home from './components/Home'
 
 const App = () => {
@@ -20,6 +21,9 @@ const App = () => {
           <Button id="journeys" color="inherit" component={Link} to="/journeys">
             Journeys
           </Button>
+          <Button id="add-journey" color="inherit" component={Link} to="/add-journey">
+            Add Journey
+          </Button>
         </Toolbar>
       </AppBar>
       <div>
@@ -28,6 +32,7 @@ const App = () => {
           <Route path="/stations" element={<StationsView />} />
           <Route path="/journeys" element={<JourneysView />} />
           <Route path="/stations/:id" element={<StationView />} />
+          <Route path="/add-journey" element={<AddJourney />} />
         </Routes>
       </div>
     </Container>
