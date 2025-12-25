@@ -1,21 +1,10 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { Box, TextField } from '@mui/material'
+import { Box, CircularProgress, TextField } from '@mui/material'
 import { useEffect, useState, ChangeEvent } from 'react'
 import { initializeStations } from '../reducers/stationsReducer'
 import SearchedStationsData from './SearchedStationData'
 import StationsData from './StationsData'
-import { toggleLoading } from '../reducers/loadingReducer'
-//import { Station } from '../types'
 import { AppDispatch, RootState } from '../store'
-
-/*interface Props {
-  stations: {
-    data: Station[]
-    totalPages: number
-  }
-  loading?: boolean
-}*/
-
 
 // component that lists all the stations
 // using material ui
@@ -24,10 +13,9 @@ const StationList = () => {
   const [currentPage, setCurrentPage] = useState(1) // state for handling current page
   const [searchTerm, setSearchTerm] = useState('') // state for searching value
   const stations = useSelector(({ stations }: RootState) => stations) // get the stations data from the store
-  //const isLoading = useSelector(({ loading } : Props) => loading) //loading state for handling loading image
+  const isLoading = useSelector(({ loading } : RootState) => loading) //loading state for handling loading image
 
   useEffect(() => {
-    dispatch(toggleLoading(false))
     const delay = setTimeout(() => {
       // dispatch the currentpage value to the reducer whenever user change the page
       dispatch(initializeStations(currentPage, searchTerm))
@@ -83,7 +71,13 @@ const StationList = () => {
           sx={{ width: 600 }}
         />
       </Box>
-      <StationsData stations={stations ?? { data: [], totalPages: 0 }} handlePageChange={handlePageChange} />
+      {!isLoading && stations ? (
+        <StationsData stations={stations ?? { data: [], totalPages: 0 }} handlePageChange={handlePageChange} />
+      ) : (
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <CircularProgress />
+        </Box>
+      )}
     </div>
   )
 }
