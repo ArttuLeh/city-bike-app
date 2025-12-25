@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { /*Journey,*/ Journey, JourneyFormValues, JourneysResponse } from '../types'
+import { Journey, JourneyFormValues, JourneysResponse } from '../types'
 const apiUrl = process.env.REACT_APP_API_URL + '/api/journeys'
 
 //axios fetch the data from backend
