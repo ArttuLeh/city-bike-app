@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { /*Station,*/ StationDetails, StationsResponse } from '../types'
+import { StationDetails, StationsResponse } from '../types'
 const apiUrl = process.env.REACT_APP_API_URL + '/api/stations'
 
 //axios fetch the data from backend
