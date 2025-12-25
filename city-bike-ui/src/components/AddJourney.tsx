@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux'
 import { addNewJourney } from '../reducers/journeyReducer';
 import { useState } from 'react';
 import type { AppDispatch } from '../store';
+import { useNavigate } from 'react-router-dom';
 
 const AddJourney = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -12,6 +13,8 @@ const AddJourney = () => {
     const [return_station_name, setReturnStationName] = useState('');
     const [covered_distance, setCoveredDistance] = useState<number>(0);
     const [duration_sec, setDuration_sec] = useState<number>(0);
+
+    const navigate = useNavigate();
 
     const resetForm = () => {
         setDepartureStationId(0);
@@ -33,6 +36,7 @@ const AddJourney = () => {
             duration_sec: duration_sec
         }
         dispatch(addNewJourney(content));
+        navigate('/journeys');
         resetForm();
     }
 
