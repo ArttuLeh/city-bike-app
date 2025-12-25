@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import stationsService from '../services/stations'
 import { toggleLoading } from './loadingReducer'
-import { /*Station,*/ StationsResponse } from '../types'
+import { StationsResponse } from '../types'
 
 
 // reducer that set the state for all the stations data
