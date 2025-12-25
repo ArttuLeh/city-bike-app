@@ -21,7 +21,7 @@ const StationView = () => {
   const { id } = useParams<{ id: string }>() // get id value from stationList component
   const station = useSelector(({ station } : RootState) => station) // get the station info from store
   const isLoading = useSelector(({ loading } : RootState) => loading) // loading state for handling loading image
-
+  
   useEffect(() => {
     // dispatch the id to the reducer everytime whenever id change
     dispatch(getStation(Number(id)))
@@ -41,22 +41,22 @@ const StationView = () => {
     },
     {
       id: 'departureStationCount',
-      title: 'Departure Station Count',
+      title: 'Total number of journeys starting from the station',
       content: station?.departureStationCount,
     },
     {
       id: 'returnStationCount',
-      title: 'Return Station Count',
+      title: 'Total number of journeys ending at the station',
       content: station?.returnStationCount,
     },
     {
       id: 'avgDepartureDistance',
-      title: 'Average distance of starting from the station (km)',
+      title: 'The average distance of a journey starting from the station (km)',
       content: station?.avgDepartureStationDistance,
     },
     {
       id: 'avgReturnDistance',
-      title: 'Average distance ending at the station (km)',
+      title: 'The average distance of a journey ending at the station (km)',
       content: station?.avgReturnStationDistance,
     },
   ]
@@ -104,7 +104,7 @@ const StationView = () => {
           <div>
             <Box sx={{ width: '100%' , height: 300}}>
               <Typography marginTop={2}>
-                Most popular departure stations for journeys starting from the station
+                Top 5 most popular departure stations for journeys ending at the station
               </Typography>
               <BarChart
                 series={[
@@ -118,7 +118,7 @@ const StationView = () => {
           <div>
             <Box sx={{ width: '%' , height: 300}}>
               <Typography marginTop={2}>
-                Most popular return stations for journeys ending at the station
+                Top 5 most popular return stations for journeys starting from the station
               </Typography>
               <BarChart
                 series={[
