@@ -39,8 +39,8 @@ Built with ASP.NET Core Web API (backend) and React + TypeScript (frontend).
    ```bash
    dotnet run
    ```
-   - API runs at `https://localhost:5000`
-   - Swagger UI at `https://localhost:5000/swagger`
+   - API runs at `http://localhost:5285`
+   - Swagger UI at `https://localhost:5285/swagger`
 
 ---
 
