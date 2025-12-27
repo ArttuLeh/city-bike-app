@@ -54,3 +54,4 @@ export interface StationDetails {
 }
 
 export type JourneyFormValues = Omit<Journey, 'id'>;
+export type StationFormValues = Omit<Station, 'id'>;

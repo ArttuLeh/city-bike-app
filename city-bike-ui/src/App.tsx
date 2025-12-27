@@ -6,6 +6,7 @@ import StationsView from './components/StationsView'
 import StationView from './components/StationView'
 import AddJourney from './components/AddJourney'
 import Home from './components/Home'
+import AddStation from './components/AddStation'
 
 const App = () => {
   return (
@@ -24,6 +25,9 @@ const App = () => {
           <Button id="add-journey" color="inherit" component={Link} to="/add-journey">
             Add Journey
           </Button>
+          <Button id="add-station" color="inherit" component={Link} to="/add-station">
+            Add Station
+          </Button>
         </Toolbar>
       </AppBar>
       <div>
@@ -31,8 +35,9 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/stations" element={<StationsView />} />
           <Route path="/journeys" element={<JourneysView />} />
-          <Route path="/stations/:id" element={<StationView />} />
+          <Route path="/station/:id" element={<StationView />} /> 
           <Route path="/add-journey" element={<AddJourney />} />
+          <Route path="/add-station" element={<AddStation />} />
         </Routes>
       </div>
     </Container>
