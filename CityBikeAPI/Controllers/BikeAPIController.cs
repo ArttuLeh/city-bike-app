@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using CityBikeAPI.Data;
-using CityBikeAPI.Models;
+using CityBikeApi.Data;
+using CityBikeApi.Models;
 
-namespace CityBikeAPI.Controllers;
+namespace CityBikeApi.Controllers;
 
 // API controller for CityBike data
 [ApiController]
@@ -72,7 +72,7 @@ public class BikeAPIController : ControllerBase
 
     //GET: /api/station/{id}
     // Returns detailed information about a single station, including statistics
-    [HttpGet("stations/{id}")]
+    [HttpGet("station/{id}")]
     public async Task<ActionResult<IEnumerable<Station>>> GetStation(int id)
     {
         try
@@ -94,12 +94,14 @@ public class BikeAPIController : ControllerBase
             // Calculate the average distance (in km) for journeys starting from this station
             var avgDepartureDistance = await _context.Journeys
                 .Where(j => j.Departure_station_id == data.Id)
-                .AverageAsync(j => j.Covered_distance_m);
+                .Select(j => (double?)j.Covered_distance_m)
+                .AverageAsync() ?? 0.0;
 
             // Calculate the average distance (in km) for journeys ending to this station
             var avgReturnDistance = await _context.Journeys
                 .Where(j => j.Return_station_id == data.Id)
-                .AverageAsync(j => j.Covered_distance_m);
+                .Select(j => (double?)j.Covered_distance_m)
+                .AverageAsync() ?? 0.0;
 
             // calculate and sort 5 most popular return stations for journeys starting from the station
             var popularReturnStations = await _context.Journeys
@@ -149,6 +151,74 @@ public class BikeAPIController : ControllerBase
         }
     }
 
+    //POST: /api/stations
+    // Adds a new station to the database
+    [HttpPost("stations")]
+    public async Task<ActionResult<Station>> AddStation([FromBody] Station newStation)
+    {
+        try
+        {
+            newStation.Id = _context.Stations.Max(s => s.Id);
+            newStation.Id += 1;
+
+            _context.Stations.Add(newStation);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetStations), new { id = newStation.Id }, newStation);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while adding a new journey");
+            return StatusCode(500, new { error = "An error occurred while processing your request" });
+        }
+    }
+
+    // DELETE: /api/stations/{id}
+    // Deletes a station by ID
+    [HttpDelete("station/{id}")]
+    public async Task<IActionResult> DeleteStation(int id)
+    {
+        try
+        {
+            var station = await _context.Stations.FindAsync(id);
+            if (station == null)
+            {
+                return NotFound();
+            }
+            _context.Stations.Remove(station);
+            await _context.SaveChangesAsync();
+            return Ok("Station deleted successfully");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while deleting station with ID {StationId}", id);
+            return StatusCode(500, new { error = "An error occurred while processing your request" });
+        }
+    }
+
+    //GET: /api/journey/{id}
+    // Returns detailed information about a single journey
+    [HttpGet("station-data/{id}")]
+    public async Task<ActionResult<IEnumerable<Station>>> GetStationData(int id)
+    {
+        try
+        {
+            IQueryable<Station> query = _context.Stations;
+            var data = await _context.Stations.FindAsync(id);
+
+            if (data == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(data);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while fetching journey");
+            return StatusCode(500, new { error = "An error occurred while processing your request" });
+        }
+    }
 
     //GET: /api/jorneys
     // Returns a paginated list of journeys, with optional search and sorting
@@ -262,7 +332,7 @@ public class BikeAPIController : ControllerBase
 
     //GET: /api/journey/{id}
     // Returns detailed information about a single journey
-    [HttpGet("journeys/{id}")]
+    [HttpGet("journey/{id}")]
     public async Task<ActionResult<IEnumerable<Journey>>> GetJourney(int id)
     {
         try
@@ -291,7 +361,8 @@ public class BikeAPIController : ControllerBase
     {
         try
         {
-            newJourney.Id = null; // Ensure the ID is null so that the database can generate it
+            newJourney.Id = _context.Journeys.Max(j => j.Id);
+            newJourney.Id += 1;
 
             _context.Journeys.Add(newJourney);
             await _context.SaveChangesAsync();
@@ -305,9 +376,9 @@ public class BikeAPIController : ControllerBase
         }
     }
 
-    // DELETE: /api/journeys/{id}
+    // DELETE: /api/journey/{id}
     // Deletes a journey by ID
-    [HttpDelete("journeys/{id}")]
+    [HttpDelete("journey/{id}")]
     public async Task<IActionResult> DeleteJourney(int id)
     {
         try
