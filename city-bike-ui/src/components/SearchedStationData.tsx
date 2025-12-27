@@ -8,8 +8,6 @@ import {
   TableHead,
   Box,
   CircularProgress,
-  Alert,
-  AlertTitle,
 } from '@mui/material'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
@@ -46,19 +44,6 @@ const SearchedStationsData = ({ stations } : Props) => {
     },
   ]
 
-  if (isLoading && stations.success === true) {
-    // show user if searched value not found
-    return (
-      <div>
-        <Alert severity="error">
-          <AlertTitle>
-            Information not found, try again a different name
-          </AlertTitle>
-        </Alert>
-      </div>
-    )
-  }
-
   return (
     <div>
       {!isLoading && stations.data ? (
@@ -81,7 +66,7 @@ const SearchedStationsData = ({ stations } : Props) => {
               {stations.data.map((station) => (
                 <TableRow key={station.id} sx={{ boxShadow: 4 }}>
                   <TableCell className="row">
-                    <Link to={`/stations/${station.id}`}>{station.name}</Link>
+                    <Link to={`/station/${station.id}`}>{station.name}</Link>
                   </TableCell>
                   <TableCell align="right">
                     {station.address} {station.town}

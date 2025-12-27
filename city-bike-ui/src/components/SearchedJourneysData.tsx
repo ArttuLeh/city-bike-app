@@ -10,8 +10,6 @@ import {
   Pagination,
   Box,
   CircularProgress,
-  Alert,
-  AlertTitle,
 } from '@mui/material'
 import { useSelector } from 'react-redux'
 import { ChangeEvent } from 'react'
@@ -61,19 +59,6 @@ const SearchedJourneysData = ({ journeys, handlePageChange } : Props) => {
       label: 'Duration (min)',
     },
   ]
-  
-  if (isLoading && journeys.success === true) {
-    // show user if searched value not found
-    return (
-      <div>
-        <Alert severity="error">
-          <AlertTitle>
-            Information not found, try again a different name
-          </AlertTitle>
-        </Alert>
-      </div>
-    )
-  }
   
   return (
     <div>
