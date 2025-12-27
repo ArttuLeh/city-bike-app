@@ -9,7 +9,11 @@ import {
   TableHead,
   Stack,
   Pagination,
+  Box,
+  CircularProgress,
 } from '@mui/material'
+import { useSelector } from 'react-redux'
+import { ChangeEvent } from 'react'
 import { Station } from '../types'
 
 interface Props {
@@ -17,10 +21,12 @@ interface Props {
     data: Station[]
     totalPages: number
   }
-  handlePageChange: (event: React.ChangeEvent<unknown>, page: number) => void
+  loading?: boolean
+  handlePageChange: (event: ChangeEvent<unknown>, page: number) => void
 }
 
 const StationData = ({ stations, handlePageChange } : Props) => {
+  const isLoading = useSelector(({ loading } : Props) => loading) //loading state for handling loading image
 
   const headCell = [
     {
@@ -39,9 +45,10 @@ const StationData = ({ stations, handlePageChange } : Props) => {
       label: 'Station ID',
     },
   ]
-  console.log("stationsdata", stations) 
+  console.log("stationsdata", stations.data) 
   return (
     <div>
+      {!isLoading && stations.data ? (
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -61,7 +68,7 @@ const StationData = ({ stations, handlePageChange } : Props) => {
             {stations.data.map((station) => (
               <TableRow key={station.id} sx={{ boxShadow: 4 }}>
                 <TableCell>
-                  <Link to={`/stations/${station.id}`}>{station.name}</Link>
+                  <Link to={`/station/${station.id}`}>{station.name}</Link>
                 </TableCell>
                 <TableCell align="right">
                   {station.address} {station.town}
@@ -72,6 +79,11 @@ const StationData = ({ stations, handlePageChange } : Props) => {
           </TableBody>
         </Table>
       </TableContainer>
+      ) : (
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <CircularProgress />
+        </Box>
+      )}
       <Stack
         spacing={3}
         sx={{
