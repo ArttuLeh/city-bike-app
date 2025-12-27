@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using CityBikeAPI.Models;
+using CityBikeApi.Models;
 
-namespace CityBikeAPI.Data;
+namespace CityBikeApi.Data;
 
 public class AppDbContext : DbContext
 {
