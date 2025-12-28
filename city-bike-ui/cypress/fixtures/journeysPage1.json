@@ -1,0 +1,16 @@
+{
+  "currentPage": 1,
+  "pageSize": 40,
+  "totalPages": 1,
+  "data": [
+    {
+      "id": 1,
+      "departure_station_id": 107,
+      "departure_station_name": "Tenholantie",
+      "return_station_id": 111,
+      "return_station_name": "Esterinportti",
+      "covered_distance_m": 1847,
+      "duration_sec": 407
+    }
+  ]
+}

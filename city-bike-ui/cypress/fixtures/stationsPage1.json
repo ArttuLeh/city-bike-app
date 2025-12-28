@@ -1,0 +1,19 @@
+{
+  "currentPage": 1,
+  "pageSize": 40,
+  "totalPages": 1,
+  "data": [
+    {
+      "id": 107,
+      "name": "Tenholantie",
+      "address": "Tenholantie 10",
+      "town": "Helsinki"
+    },
+    {
+      "id": 111,
+      "name": "Esterinportti",
+      "address": "Esterinportti 1",
+      "town": "Helsinki"
+    }
+  ]
+}

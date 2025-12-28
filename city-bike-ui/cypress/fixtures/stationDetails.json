@@ -1,0 +1,21 @@
+{
+  "success": true,
+  "data": {
+    "id": 107,
+    "name": "Tenholantie",
+    "address": "Tenholantie 10",
+    "town": "Helsinki"
+  },
+  "departureStationCount": 5,
+  "returnStationCount": 4,
+  "avgDepartureStationDistance": 1.85,
+  "avgReturnStationDistance": 1.65,
+  "popularReturnStations": [
+    { "returnStationId": 111, "returnStationName": "Esterinportti", "journeyCount": 3 },
+    { "returnStationId": 113, "returnStationName": "Pasilanasema", "journeyCount": 2 }
+  ],
+  "popularDepartureStations": [
+    { "departureStationId": 111, "departureStationName": "Esterinportti", "journeyCount": 3 },
+    { "departureStationId": 113, "departureStationName": "Pasilanasema", "journeyCount": 2 }
+  ]
+}

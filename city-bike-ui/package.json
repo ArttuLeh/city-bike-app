@@ -31,7 +31,11 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "e2e": "start-server-and-test start http://localhost:3000 cypress:run",
+    "e2e:open": "start-server-and-test start http://localhost:3000 cypress:open"
   },
   "eslintConfig": {
     "extends": [
@@ -52,6 +56,12 @@
     ]
   },
   "devDependencies": {
-    "@types/axios": "^0.14.4"
+    "@types/axios": "^0.14.4",
+    "cypress": "^13.7.2",
+    "@types/cypress": "^1.1.6",
+    "start-server-and-test": "^2.0.3"
+  },
+  "engines": { 
+    "node": ">=20 <21" 
   }
 }

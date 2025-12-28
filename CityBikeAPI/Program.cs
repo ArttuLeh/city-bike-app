@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using CityBikeAPI.Data;
+using CityBikeApi.Data;
 
-namespace CityBikeAPI;
+namespace CityBikeApi;
 
 public class Program
 {
@@ -11,8 +11,17 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddControllers();
-        builder.Services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(builder.Configuration.GetConnectionString("CityBikeDatabase")));
+        // Use InMemory provider when running tests (environment 'Testing')
+        if (builder.Environment.IsEnvironment("Testing"))
+        {
+            builder.Services.AddDbContext<AppDbContext>(options =>
+                options.UseInMemoryDatabase("TestDb"));
+        }
+        else
+        {
+            builder.Services.AddDbContext<AppDbContext>(options =>
+                options.UseNpgsql(builder.Configuration.GetConnectionString("CityBikeDatabase")));
+        }
 
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
