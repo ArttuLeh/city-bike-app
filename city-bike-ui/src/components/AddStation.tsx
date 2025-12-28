@@ -48,7 +48,7 @@ const AddStation = () => {
 
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: 400, margin: '0 auto' }}>
-        <h2>Add New Journey</h2>
+        <h2>Add New Station</h2>
 
         <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 6 }}>
