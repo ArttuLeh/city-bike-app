@@ -1,6 +1,6 @@
 export interface Station {
     id: string;
-    FID: number;
+    fid: number;
     name: string;
     address: string;
     town: string;
@@ -44,11 +44,19 @@ export interface StationDetails {
     popularDepartureStations: {
         departureStationId: number;
         departureStationName: string;
+        depratureStationCordinate: {
+            x: number;
+            y: number;
+        };
         journeyCount: number;
     }[];
     popularReturnStations: {
         returnStationId: number;
         returnStationName: string;
+        returnStationCordinate: {
+            x: number;
+            y: number;
+        };
         journeyCount: number;
     }[];
 }
