@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 const AddStation = () => {
     const dispatch = useDispatch<AppDispatch>();
-    const [FID, setFID] = useState<number>(0);
+    const [fid, setFid] = useState<number>(0);
     const [name, setName] = useState('');
     const [address, setAddress] = useState('');
     const [town, setTown] = useState('');
@@ -19,7 +19,7 @@ const AddStation = () => {
     const navigate = useNavigate();
 
     const resetForm = () => {
-        setFID(0);
+        setFid(0);
         setName('');
         setAddress('');
         setTown('');
@@ -32,7 +32,7 @@ const AddStation = () => {
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         const content = {
-            FID: FID,
+            fid: fid,
             name: name,
             address: address,
             town: town,
@@ -56,8 +56,8 @@ const AddStation = () => {
                     label="FID"
                     type="number"
                     fullWidth
-                    value={FID}
-                    onChange={(e) => setFID(Number(e.target.value))}
+                    value={fid}
+                    onChange={(e) => setFid(Number(e.target.value))}
                     required
                 />
             </Grid>
