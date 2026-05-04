@@ -41,6 +41,7 @@ public class BikeAPIController : ControllerBase
             {
                 // No search: return paginated stations
                 var data = await query
+                    .OrderBy(station => station.Fid) // Default sorting by ID
                     .Skip((currentPage - 1) * pageSize)
                     .Take(pageSize)
                     .ToListAsync();
@@ -56,11 +57,25 @@ public class BikeAPIController : ControllerBase
             else
             {
                 // Search: return all stations whose name contains the search string
-                var data = await query
-                .Where(station => station.Name != null && station.Name.ToLower().Contains(search))
-                .ToListAsync();
+                var filteredQuery = query
+                    .Where(station => station.Name != null && station.Name.ToLower().Contains(search));
+                //.ToListAsync();
 
-                return Ok(new { data });
+                var totalItems = await filteredQuery.CountAsync();
+
+                var data = await filteredQuery
+                    .OrderBy(station => station.Fid) // Default sorting by ID
+                    .Skip((currentPage - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+                return Ok(new
+                {
+                    currentPage,
+                    pageSize,
+                    totalPages = (int)Math.Ceiling(totalItems / (double)pageSize),
+                    data
+                });
             }
         }
         catch (Exception ex)
@@ -86,31 +101,40 @@ public class BikeAPIController : ControllerBase
             }
 
             // Get the number of journeys starting from this station
-            var departureStationCount = await _context.Journeys.CountAsync(j => j.Departure_station_id == data.Id);
+            //var departureStationCount = await _context.Journeys.CountAsync(j => j.Departure_station_id == data.Id);
+            var departureStationCount = await _context.Journeys.CountAsync(j => j.Departure_station_name == data.Name);
 
             // Get the number of journeys ending to this station
-            var returnStationCount = await _context.Journeys.CountAsync(j => j.Return_station_id == data.Id);
+            //var returnStationCount = await _context.Journeys.CountAsync(j => j.Return_station_id == data.Id);
+            var returnStationCount = await _context.Journeys.CountAsync(j => j.Return_station_name == data.Name);
 
             // Calculate the average distance (in km) for journeys starting from this station
             var avgDepartureDistance = await _context.Journeys
-                .Where(j => j.Departure_station_id == data.Id)
+                //.Where(j => j.Departure_station_id == data.Id)
+                .Where(j => j.Departure_station_name == data.Name)
                 .Select(j => (double?)j.Covered_distance_m)
                 .AverageAsync() ?? 0.0;
 
             // Calculate the average distance (in km) for journeys ending to this station
             var avgReturnDistance = await _context.Journeys
-                .Where(j => j.Return_station_id == data.Id)
+                //.Where(j => j.Return_station_id == data.Id)
+                .Where(j => j.Return_station_name == data.Name)
                 .Select(j => (double?)j.Covered_distance_m)
                 .AverageAsync() ?? 0.0;
 
             // calculate and sort 5 most popular return stations for journeys starting from the station
             var popularReturnStations = await _context.Journeys
-                .Where(j => j.Departure_station_id == data.Id && j.Return_station_name != null)
+                //.Where(j => j.Departure_station_id == data.Id && j.Return_station_name != null)
+                .Where(j => j.Departure_station_name == data.Name && j.Return_station_name != null)
                 .GroupBy(j => new { j.Return_station_id, j.Return_station_name })
                 .Select(g => new
                 {
                     ReturnStationId = g.Key.Return_station_id,
                     ReturnStationName = g.Key.Return_station_name,
+                    ReturnStationCordinate = _context.Stations
+                        .Where(s => s.Fid == g.Key.Return_station_id)
+                        .Select(s => new { s.X, s.Y })
+                        .FirstOrDefault(),
                     JourneyCount = g.Count()
                 })
                 .OrderByDescending(g => g.JourneyCount)
@@ -119,12 +143,17 @@ public class BikeAPIController : ControllerBase
 
             // calculate and sort 5 most popular departure stations for journeys ending at the station
             var popularDepartureStations = await _context.Journeys
-                .Where(j => j.Return_station_id == data.Id && j.Departure_station_name != null)
+                //.Where(j => j.Return_station_id == data.Id && j.Departure_station_name != null)
+                .Where(j => j.Return_station_name == data.Name && j.Departure_station_name != null)
                 .GroupBy(j => new { j.Departure_station_id, j.Departure_station_name })
                 .Select(g => new
                 {
                     DepartureStationId = g.Key.Departure_station_id,
                     DepartureStationName = g.Key.Departure_station_name,
+                    DepratureStationCordinate = _context.Stations
+                        .Where(s => s.Fid == g.Key.Departure_station_id)
+                        .Select(s => new { s.X, s.Y })
+                        .FirstOrDefault(),
                     JourneyCount = g.Count()
                 })
                 .OrderByDescending(g => g.JourneyCount)
@@ -146,7 +175,7 @@ public class BikeAPIController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error occurred while fetching station with ID {StationId}", id);
+            _logger.LogError(ex, "Error occurred while fetching station with FID {StationFid}", id);
             return StatusCode(500, new { error = "An error occurred while processing your request" });
         }
     }
@@ -306,10 +335,16 @@ public class BikeAPIController : ControllerBase
             else
             {
                 // Search: return journeys where departure station name contains the search string
-                var data = await query
-                    .Where(
-                        journey => journey.Departure_station_name != null &&
-                        journey.Departure_station_name.ToLower().Contains(search))
+                var filteredQuery = query
+                    .Where(journey => journey.Departure_station_name != null &&
+                                      journey.Departure_station_name.ToLower().Contains(search));
+                //.Skip((currentPage - 1) * pageSize)
+                //.Take(pageSize)
+                //.ToListAsync();
+
+                var totalItems = await filteredQuery.CountAsync();
+
+                var data = await filteredQuery
                     .Skip((currentPage - 1) * pageSize)
                     .Take(pageSize)
                     .ToListAsync();
@@ -318,7 +353,7 @@ public class BikeAPIController : ControllerBase
                 {
                     currentPage,
                     pageSize,
-                    totalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+                    totalPages = (int)Math.Ceiling(totalItems / (double)pageSize),
                     data
                 });
             }
