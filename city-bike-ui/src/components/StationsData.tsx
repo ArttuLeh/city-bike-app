@@ -27,7 +27,7 @@ interface Props {
 
 const StationData = ({ stations, handlePageChange } : Props) => {
   const isLoading = useSelector(({ loading } : Props) => loading) //loading state for handling loading image
-
+  console.log("stationsdata", stations)
   const headCell = [
     {
       id: 'name',
@@ -40,9 +40,9 @@ const StationData = ({ stations, handlePageChange } : Props) => {
       label: 'Address',
     },
     {
-      id: 'id',
+      id: 'fid',
       numeric: true,
-      label: 'Station ID',
+      label: 'Statio ID',
     },
   ]
   console.log("stationsdata", stations.data) 
@@ -73,7 +73,7 @@ const StationData = ({ stations, handlePageChange } : Props) => {
                 <TableCell align="right">
                   {station.address} {station.town}
                 </TableCell>
-                <TableCell align="right">{station.id}</TableCell>
+                <TableCell align="right">{station.fid}</TableCell>
               </TableRow>
             ))}
           </TableBody>
