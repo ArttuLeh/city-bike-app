@@ -6,10 +6,13 @@ import {
   TableRow,
   TableCell,
   TableHead,
+  Pagination,
   Box,
   CircularProgress,
+  Stack,
 } from '@mui/material'
 import { useSelector } from 'react-redux'
+import { ChangeEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { Station } from '../types'
 import { RootState } from '../store'
@@ -17,12 +20,13 @@ import { RootState } from '../store'
 interface Props {
   stations: {
     data: Station[]
+    totalPages: number
     success?: boolean
   }
-  handlePageChange: (event: React.ChangeEvent<{}>, value: number) => void
+  handlePageChange: (event: ChangeEvent<unknown>, value: number) => void
 }
 
-const SearchedStationsData = ({ stations } : Props) => {
+const SearchedStationsData = ({ stations, handlePageChange } : Props) => {
   const isLoading = useSelector(({ loading } : RootState) => loading) // loading state for handling loading image
 
   // array of objects for table cell
@@ -82,6 +86,15 @@ const SearchedStationsData = ({ stations } : Props) => {
           <CircularProgress />
         </Box>
       )}
+      {
+        <Stack spacing={3} sx={{ paddingTop: 2, paddingBottom: 2 }}>
+          <Pagination
+            sx={{ display: 'flex', justifyContent: 'center' }}
+            count={stations.totalPages}
+            onChange={handlePageChange}
+          />
+        </Stack>
+      }
     </div>
   )
 }
