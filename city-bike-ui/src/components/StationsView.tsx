@@ -52,7 +52,7 @@ const StationList = () => {
           />
         </Box>
         <SearchedStationsData
-          stations={stations ?? { data: [] }}
+          stations={stations ?? { data: [], totalPages: 0 }}
           handlePageChange={handlePageChange}
         />
       </div>

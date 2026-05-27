@@ -59,7 +59,7 @@ const JourneysList = () => {
           <TextField
             id="search"
             type="search"
-            label="Search departure station by name"
+            label="Search journeys by adding departure station name"
             value={searchTerm}
             onChange={handleSearch}
             sx={{ width: 600 }}
@@ -81,7 +81,7 @@ const JourneysList = () => {
           <TextField
             id="search"
             type="search"
-            label="Search departure station by name"
+            label="Search journeys by adding departure station name"
             value={searchTerm}
             onChange={handleSearch}
             sx={{ width: 600 }}

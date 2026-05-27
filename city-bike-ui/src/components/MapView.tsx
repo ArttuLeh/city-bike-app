@@ -21,7 +21,7 @@ L.Icon.Default.mergeOptions({
 interface PopularDepartureStation {
   departureStationId: number
   departureStationName: string
-  departureStationCordinate: { x: number; y: number }
+  departureStationCoordinate: { x: number; y: number }
   journeyCount: number
 }
 
@@ -29,7 +29,7 @@ interface PopularDepartureStation {
 interface PopularReturnStation {
   returnStationId: number
   returnStationName: string
-  returnStationCordinate: { x: number; y: number }
+  returnStationCoordinate: { x: number; y: number }
   journeyCount: number
 }
 
@@ -82,10 +82,10 @@ const MapView = ({ station, popularDepartureStations, popularReturnStations }: P
   // Add popular departure stations (journeys ending at the current station)
   if (isSingleStation && popularDepartureStations) {
     popularDepartureStations.forEach((station) => {
-      if (station.departureStationCordinate) {
+      if (station.departureStationCoordinate) {
         connectedStations.push({
           name: station.departureStationName,
-          position: [station.departureStationCordinate.y, station.departureStationCordinate.x],
+          position: [station.departureStationCoordinate.y, station.departureStationCoordinate.x],
           journeyCount: station.journeyCount,
           type: 'departure',
         })
@@ -96,10 +96,10 @@ const MapView = ({ station, popularDepartureStations, popularReturnStations }: P
   // Add popular return stations (journeys starting from the current station)
   if (isSingleStation && popularReturnStations) {
     popularReturnStations.forEach((station) => {
-      if (station.returnStationCordinate) {
+      if (station.returnStationCoordinate) {
         connectedStations.push({
           name: station.returnStationName,
-          position: [station.returnStationCordinate.y, station.returnStationCordinate.x],
+          position: [station.returnStationCoordinate.y, station.returnStationCoordinate.x],
           journeyCount: station.journeyCount,
           type: 'return',
         })
