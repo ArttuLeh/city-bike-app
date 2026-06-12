@@ -44,7 +44,7 @@ export interface StationDetails {
     popularDepartureStations: {
         departureStationId: number;
         departureStationName: string;
-        depratureStationCordinate: {
+        departureStationCoordinate: {
             x: number;
             y: number;
         };
@@ -53,7 +53,7 @@ export interface StationDetails {
     popularReturnStations: {
         returnStationId: number;
         returnStationName: string;
-        returnStationCordinate: {
+        returnStationCoordinate: {
             x: number;
             y: number;
         };
