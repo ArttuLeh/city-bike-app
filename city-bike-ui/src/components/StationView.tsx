@@ -13,6 +13,7 @@ import {
   CardContent,
 } from '@mui/material'
 import { BarChart } from '@mui/x-charts/BarChart';
+import MapView from './MapView'
 
 
 // component that show the station information
@@ -26,7 +27,7 @@ const StationView = () => {
     // dispatch the id to the reducer everytime whenever id change
     dispatch(getStation(Number(id)))
   }, [dispatch, id])
-
+  console.log("stationView", station)
   // cards for station information
   const cards = [
     {
@@ -35,9 +36,9 @@ const StationView = () => {
       content: station?.data.address,
     },
     {
-      id: 'id',
+      id: 'fid',
       title: 'Station ID',
-      content: station?.data.id,
+      content: station?.data.fid,
     },
     {
       id: 'departureStationCount',
@@ -128,6 +129,13 @@ const StationView = () => {
                 yAxis={[{ width: 50  }]}
               />
             </Box>
+          </div>
+          <div>
+            <MapView
+              station={station.data}
+              popularDepartureStations={station.popularDepartureStations}
+              popularReturnStations={station.popularReturnStations}
+            /> 
           </div>
         </div>
       ) : (
