@@ -1,7 +1,7 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import journeyService from '../services/journeys'
-import { toggleLoading } from './loadingReducer'
-import { JourneyFormValues, JourneysResponse } from '../types'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import journeyService from '../services/journeys';
+import { toggleLoading } from './loadingReducer';
+import { JourneyFormValues, JourneysResponse } from '../types';
 
 // reducer that set the state for journey data
 const journeysSlice = createSlice({
@@ -9,20 +9,20 @@ const journeysSlice = createSlice({
   initialState: null as JourneysResponse | null,
   reducers: {
     setJourneys(state, action: PayloadAction<JourneysResponse>) {
-      return action.payload
+      return action.payload;
     },
     appendJourney(state, action: PayloadAction<any>) {
-      return action.payload 
+      return action.payload;
     },
   },
-})
+});
 
 // dispatch the data to store
 export const initializeJourneys = (
   currentPage: number,
   sortField: any,
   sortOrder: string,
-  searchTerm: string
+  searchTerm: string,
 ) => {
   return async (dispatch: any) => {
     // call axios
@@ -30,24 +30,24 @@ export const initializeJourneys = (
       currentPage,
       sortField,
       sortOrder,
-      searchTerm
-    )
-    dispatch(toggleLoading(true))
-    dispatch(setJourneys(data))
-    dispatch(toggleLoading(false))
-  }
-}
+      searchTerm,
+    );
+    dispatch(toggleLoading(true));
+    dispatch(setJourneys(data));
+    dispatch(toggleLoading(false));
+  };
+};
 
 export const addNewJourney = (content: JourneyFormValues) => {
   return async (dispatch: any) => {
     try {
-      const newJourney = await journeyService.create(content)
-      dispatch(appendJourney(newJourney))
+      const newJourney = await journeyService.create(content);
+      dispatch(appendJourney(newJourney));
     } catch (error) {
-      console.error('Error adding new journey:', error)
-    } 
-  }
-}
+      console.error('Error adding new journey:', error);
+    }
+  };
+};
 
-export const { setJourneys, appendJourney } = journeysSlice.actions
-export default journeysSlice.reducer
+export const { setJourneys, appendJourney } = journeysSlice.actions;
+export default journeysSlice.reducer;

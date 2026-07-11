@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit';
 
 // reducer that set the state for loading image
 export const loadingSlice = createSlice({
@@ -6,10 +6,10 @@ export const loadingSlice = createSlice({
   initialState: true,
   reducers: {
     toggleLoading(state, { payload }) {
-      return payload
+      return payload;
     },
   },
-})
+});
 
-export const { toggleLoading } = loadingSlice.actions
-export default loadingSlice.reducer
+export const { toggleLoading } = loadingSlice.actions;
+export default loadingSlice.reducer;

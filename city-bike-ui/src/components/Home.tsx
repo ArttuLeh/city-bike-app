@@ -1,12 +1,16 @@
+import { Typography } from '@mui/material';
+
 const Home = () => {
   return (
     <div>
-      <h2>Helsinki City Bike app</h2>
-      <p>
+      <Typography variant="h4" align="center" sx={{ mb: 3 }}>
+        Helsinki City Bike app
+      </Typography>
+      <Typography variant="body1" align="center">
         Here you can browse informations about Helsinki City Bike stations and
         journeys.
-      </p>
+      </Typography>
     </div>
-  )
-}
-export default Home
+  );
+};
+export default Home;

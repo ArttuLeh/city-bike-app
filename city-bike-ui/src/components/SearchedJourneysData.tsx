@@ -10,26 +10,26 @@ import {
   Pagination,
   Box,
   CircularProgress,
-} from '@mui/material'
-import { useSelector } from 'react-redux'
-import { ChangeEvent } from 'react'
-import { Journey } from '../types'
-import { RootState } from '../store'
+} from '@mui/material';
+import { useSelector } from 'react-redux';
+import { ChangeEvent } from 'react';
+import { Journey } from '../types';
+import { RootState } from '../store';
 
 interface Props {
   journeys: {
-    data: Journey[]
-    totalPages: number
-    success?: boolean
-  }
-  handlePageChange: (event: ChangeEvent<unknown>, value: number) => void
-  handleSort: (value: string) => void
-  loading?: boolean
+    data: Journey[];
+    totalPages: number;
+    success?: boolean;
+  };
+  handlePageChange: (event: ChangeEvent<unknown>, value: number) => void;
+  handleSort: (value: string) => void;
+  loading?: boolean;
 }
 
 //component that show the searched data
-const SearchedJourneysData = ({ journeys, handlePageChange } : Props) => {
-  const isLoading = useSelector(({ loading } : RootState) => loading) // loading state for handling loading image
+const SearchedJourneysData = ({ journeys, handlePageChange }: Props) => {
+  const isLoading = useSelector(({ loading }: RootState) => loading); // loading state for handling loading image
 
   // array of objects for table cell
   const headCell = [
@@ -58,8 +58,8 @@ const SearchedJourneysData = ({ journeys, handlePageChange } : Props) => {
       numeric: true,
       label: 'Duration (min)',
     },
-  ]
-  
+  ];
+
   return (
     <div>
       {!isLoading && journeys.data ? (
@@ -114,6 +114,6 @@ const SearchedJourneysData = ({ journeys, handlePageChange } : Props) => {
         </Stack>
       }
     </div>
-  )
-}
-export default SearchedJourneysData
+  );
+};
+export default SearchedJourneysData;

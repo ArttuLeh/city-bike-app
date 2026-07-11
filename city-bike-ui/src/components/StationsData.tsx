@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Paper,
   TableContainer,
@@ -11,23 +11,25 @@ import {
   Pagination,
   Box,
   CircularProgress,
-} from '@mui/material'
-import { useSelector } from 'react-redux'
-import { ChangeEvent } from 'react'
-import { Station } from '../types'
+} from '@mui/material';
+import { useSelector } from 'react-redux';
+import { ChangeEvent } from 'react';
+import { Station } from '../types';
 
 interface Props {
   stations: {
-    data: Station[]
-    totalPages: number
-  }
-  loading?: boolean
-  handlePageChange: (event: ChangeEvent<unknown>, page: number) => void
+    data: Station[];
+    totalPages: number;
+  };
+  loading?: boolean;
+  handlePageChange: (event: ChangeEvent<unknown>, page: number) => void;
 }
 
-const StationData = ({ stations, handlePageChange } : Props) => {
-  const isLoading = useSelector(({ loading } : Props) => loading) //loading state for handling loading image
-  console.log("stationsdata", stations)
+const StationData = ({ stations, handlePageChange }: Props) => {
+  const isLoading = useSelector(({ loading }: Props) => loading); //loading state for handling loading image
+  console.log('stationsdata', stations);
+  const navigate = useNavigate();
+
   const headCell = [
     {
       id: 'name',
@@ -36,49 +38,53 @@ const StationData = ({ stations, handlePageChange } : Props) => {
     },
     {
       id: 'address',
-      numeric: true,
+      numeric: false,
       label: 'Address',
     },
     {
       id: 'fid',
-      numeric: true,
-      label: 'Statio ID',
+      numeric: false,
+      label: 'Station ID',
     },
-  ]
-  console.log("stationsdata", stations.data) 
+  ];
+  console.log('stationsdata', stations.data);
   return (
     <div>
       {!isLoading && stations.data ? (
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow sx={{ boxShadow: 4 }}>
-              {headCell.map((headCell) => (
-                <TableCell
-                  key={headCell.id}
-                  sx={{ fontWeight: 'bold' }}
-                  align={headCell.numeric ? 'right' : 'left'}
-                >
-                  {headCell.label}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {stations.data.map((station) => (
-              <TableRow key={station.id} sx={{ boxShadow: 4 }}>
-                <TableCell>
-                  <Link to={`/station/${station.id}`}>{station.name}</Link>
-                </TableCell>
-                <TableCell align="right">
-                  {station.address} {station.town}
-                </TableCell>
-                <TableCell align="right">{station.fid}</TableCell>
+        <TableContainer component={Paper} elevation={0}>
+          <Table>
+            <TableHead>
+              <TableRow sx={{ boxShadow: 4 }}>
+                {headCell.map((headCell) => (
+                  <TableCell
+                    key={headCell.id}
+                    sx={{ fontWeight: 'bold' }}
+                    align={headCell.numeric ? 'right' : 'left'}
+                  >
+                    {headCell.label}
+                  </TableCell>
+                ))}
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {stations.data.map((station) => (
+                <TableRow
+                  key={station.id}
+                  onClick={() => navigate(`/station/${station.id}`)}
+                  tabIndex={0}
+                  role="link"
+                  sx={{ cursor: 'pointer' }}
+                >
+                  <TableCell>{station.name}</TableCell>
+                  <TableCell align="left">
+                    {station.address} {station.town}
+                  </TableCell>
+                  <TableCell align="left">{station.fid}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       ) : (
         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
           <CircularProgress />
@@ -98,6 +104,6 @@ const StationData = ({ stations, handlePageChange } : Props) => {
         />
       </Stack>
     </div>
-  )
-}
-export default StationData
+  );
+};
+export default StationData;
