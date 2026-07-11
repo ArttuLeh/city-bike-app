@@ -10,24 +10,24 @@ import {
   Box,
   CircularProgress,
   Stack,
-} from '@mui/material'
-import { useSelector } from 'react-redux'
-import { ChangeEvent } from 'react'
-import { Link } from 'react-router-dom'
-import { Station } from '../types'
-import { RootState } from '../store'
+} from '@mui/material';
+import { useSelector } from 'react-redux';
+import { ChangeEvent } from 'react';
+import { Link } from 'react-router-dom';
+import { Station } from '../types';
+import { RootState } from '../store';
 
 interface Props {
   stations: {
-    data: Station[]
-    totalPages: number
-    success?: boolean
-  }
-  handlePageChange: (event: ChangeEvent<unknown>, value: number) => void
+    data: Station[];
+    totalPages: number;
+    success?: boolean;
+  };
+  handlePageChange: (event: ChangeEvent<unknown>, value: number) => void;
 }
 
-const SearchedStationsData = ({ stations, handlePageChange } : Props) => {
-  const isLoading = useSelector(({ loading } : RootState) => loading) // loading state for handling loading image
+const SearchedStationsData = ({ stations, handlePageChange }: Props) => {
+  const isLoading = useSelector(({ loading }: RootState) => loading); // loading state for handling loading image
 
   // array of objects for table cell
   const headCell = [
@@ -46,7 +46,7 @@ const SearchedStationsData = ({ stations, handlePageChange } : Props) => {
       numeric: true,
       label: 'Station ID',
     },
-  ]
+  ];
 
   return (
     <div>
@@ -96,6 +96,6 @@ const SearchedStationsData = ({ stations, handlePageChange } : Props) => {
         </Stack>
       }
     </div>
-  )
-}
-export default SearchedStationsData
+  );
+};
+export default SearchedStationsData;
