@@ -17,7 +17,7 @@ Built with ASP.NET Core Web API (backend) and React + TypeScript (frontend).
 
 ## Tech Stack
 
-- **Backend:** ASP.NET Core 8, Entity Framework Core, PostgreSQL/SQLite, Swashbuckle (Swagger)
+- **Backend:** ASP.NET Core 10, Entity Framework Core, PostgreSQL/SQLite, Swashbuckle (Swagger)
 - **Frontend:** React, TypeScript, MUI, Redux Toolkit, MUI X Charts
 
 ---
@@ -27,6 +27,7 @@ Built with ASP.NET Core Web API (backend) and React + TypeScript (frontend).
 ### Backend (API)
 
 1. **Install dependencies:**
+
    ```bash
    cd CityBikeAPI
    dotnet restore
@@ -39,6 +40,7 @@ Built with ASP.NET Core Web API (backend) and React + TypeScript (frontend).
    ```bash
    dotnet run
    ```
+
    - API runs at `http://localhost:5285`
    - Swagger UI at `https://localhost:5285/swagger`
 
@@ -47,6 +49,7 @@ Built with ASP.NET Core Web API (backend) and React + TypeScript (frontend).
 ### Frontend (UI)
 
 1. **Install dependencies:**
+
    ```bash
    cd city-bike-ui
    npm install
@@ -56,6 +59,7 @@ Built with ASP.NET Core Web API (backend) and React + TypeScript (frontend).
    ```bash
    npm start
    ```
+
    - Runs at `http://localhost:3000` (or `https://localhost:3000` if using HTTPS)
 
 ---
