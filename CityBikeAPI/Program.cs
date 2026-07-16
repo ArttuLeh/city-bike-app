@@ -1,5 +1,10 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using CityBikeApi.Data;
+using CityBikeApi.Models;
 
 namespace CityBikeApi;
 
@@ -9,9 +14,9 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Add services to the container.
+        // add services to the container.
         builder.Services.AddControllers();
-        // Use InMemory provider when running tests (environment 'Testing')
+        // use InMemory provider when running tests (environment 'Testing')
         if (builder.Environment.IsEnvironment("Testing"))
         {
             builder.Services.AddDbContext<AppDbContext>(options =>
@@ -23,7 +28,45 @@ public class Program
                 options.UseNpgsql(builder.Configuration.GetConnectionString("CityBikeDatabase")));
         }
 
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+        // identity setup
+        // addIdentity registers UserManager<T>, RoleManager<T>, SignInManager<T>
+        // as injectable services. These are the tools you use in AuthController.
+        builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+        {
+            options.Password.RequiredLength = 8;
+            options.Password.RequireNonAlphanumeric = false;
+        })
+        .AddEntityFrameworkStores<AppDbContext>() // store users in your existing DB
+        .AddDefaultTokenProviders();
+
+        // jwt authentication setup
+        // read the secret key from appsettings.json
+        var jwtKey = builder.Configuration["AuthConfiguration:Key"]!;
+
+        builder.Services.AddAuthentication(options =>
+        {
+            // tell ASP.NET to use JWT as the default way to authenticate requests
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true, // reject expired tokens
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = builder.Configuration["AuthConfiguration:Issuer"],
+                ValidAudience = builder.Configuration["AuthConfiguration:Audience"],
+                // this is how the backend verifies the token hasn't been tampered with
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+            };
+        });
+
+        // enables [Authorize] attributes
+        builder.Services.AddAuthorization();
+
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
@@ -34,25 +77,30 @@ public class Program
                    .AllowAnyHeader();
         }));
 
-        // Build the app
+        // build the app
         var app = builder.Build();
 
-        // Configure the HTTP request pipeline.
+        // authentication must come before Authorization
+        app.UseAuthentication(); // <-- reads + validates the JWT token
+        app.UseAuthorization(); // <-- checks [Authorize] attributes
+
+        // configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
             app.UseSwaggerUI();
         }
 
-        app.UseHttpsRedirection();
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseHttpsRedirection();
+        }
 
         app.UseCors("CorsPolicy");
 
-        app.UseAuthorization();
-
         app.MapControllers();
 
-        // Run the app
+        // run the app
         app.Run();
     }
 }
