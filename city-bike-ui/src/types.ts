@@ -1,65 +1,84 @@
 export interface Station {
-    id: string;
-    fid: number;
-    name: string;
-    address: string;
-    town: string;
-    operator: string;
-    capacity: number;
-    x: number;
-    y: number;
+  id: string;
+  fid: number;
+  name: string;
+  address: string;
+  town: string;
+  operator: string;
+  capacity: number;
+  x: number;
+  y: number;
 }
 
 export interface Journey {
-    id: number;
-    departure_station_id: number;
-    departure_station_name: string;
-    return_station_id: number;
-    return_station_name: string;
-    covered_distance_m: number;
-    duration_sec: number;
+  id: number;
+  departure_station_id: number;
+  departure_station_name: string;
+  return_station_id: number;
+  return_station_name: string;
+  covered_distance_m: number;
+  duration_sec: number;
 }
 
 export interface StationsResponse {
-    success: boolean;
-    data: Station[];
-    totalPages: number;
-    currentPage: number;
+  success: boolean;
+  data: Station[];
+  totalPages: number;
+  currentPage: number;
 }
 
 export interface JourneysResponse {
-    success: boolean;
-    data: Journey[];
-    totalPages: number;
-    currentPage: number;
+  success: boolean;
+  data: Journey[];
+  totalPages: number;
+  currentPage: number;
 }
 
 export interface StationDetails {
-    success: boolean;
-    data: Station;
-    departureStationCount: number;
-    returnStationCount: number;
-    avgDepartureStationDistance: number;
-    avgReturnStationDistance: number;
-    popularDepartureStations: {
-        departureStationId: number;
-        departureStationName: string;
-        departureStationCoordinate: {
-            x: number;
-            y: number;
-        };
-        journeyCount: number;
-    }[];
-    popularReturnStations: {
-        returnStationId: number;
-        returnStationName: string;
-        returnStationCoordinate: {
-            x: number;
-            y: number;
-        };
-        journeyCount: number;
-    }[];
+  success: boolean;
+  data: Station;
+  departureStationCount: number;
+  returnStationCount: number;
+  avgDepartureStationDistance: number;
+  avgReturnStationDistance: number;
+  popularDepartureStations: {
+    departureStationId: number;
+    departureStationName: string;
+    departureStationCoordinate: {
+      x: number;
+      y: number;
+    };
+    journeyCount: number;
+  }[];
+  popularReturnStations: {
+    returnStationId: number;
+    returnStationName: string;
+    returnStationCoordinate: {
+      x: number;
+      y: number;
+    };
+    journeyCount: number;
+  }[];
 }
 
 export type JourneyFormValues = Omit<Journey, 'id'>;
 export type StationFormValues = Omit<Station, 'id'>;
+
+export interface LoginFormValues {
+  email: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  success: boolean;
+  token: string;
+  email: string;
+  role: 'User' | 'Admin';
+}
+
+export interface AuthState {
+  token: string | null;
+  email: string | null;
+  role: 'User' | 'Admin' | null;
+  isAuthenticated: boolean;
+}
