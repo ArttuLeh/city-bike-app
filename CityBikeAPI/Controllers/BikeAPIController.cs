@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CityBikeApi.Data;
 using CityBikeApi.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CityBikeApi.Controllers;
 
@@ -13,7 +14,7 @@ public class BikeAPIController : ControllerBase
     private readonly ILogger<BikeAPIController> _logger;
     private readonly AppDbContext _context;
 
-    // Constructor with dependency injection for logger and database context
+    // constructor with dependency injection for logger and database context
     public BikeAPIController(ILogger<BikeAPIController> logger, AppDbContext context)
     {
         _logger = logger;
@@ -21,7 +22,7 @@ public class BikeAPIController : ControllerBase
     }
 
     //GET: /api/stations
-    // Returns a paginated list of stations, with optional search by name
+    // returns a paginated list of stations, with optional search by name
     [HttpGet("stations")]
     public async Task<ActionResult<IEnumerable<Station>>> GetStations(int? page, string search = "")
     {
@@ -39,7 +40,7 @@ public class BikeAPIController : ControllerBase
 
             if (string.IsNullOrEmpty(search))
             {
-                // No search: return paginated stations
+                // no search: return paginated stations
                 var data = await query
                     .OrderBy(station => station.Fid) // Default sorting by ID
                     .Skip((currentPage - 1) * pageSize)
@@ -56,7 +57,7 @@ public class BikeAPIController : ControllerBase
             }
             else
             {
-                // Search: return all stations whose name contains the search string
+                // search: return all stations whose name contains the search string
                 var filteredQuery = query
                     .Where(station => station.Name != null && station.Name.ToLower().Contains(search));
                 //.ToListAsync();
@@ -86,7 +87,7 @@ public class BikeAPIController : ControllerBase
     }
 
     //GET: /api/station/{id}
-    // Returns detailed information about a single station, including statistics
+    // returns detailed information about a single station, including statistics
     [HttpGet("station/{id}")]
     public async Task<ActionResult<IEnumerable<Station>>> GetStation(int id)
     {
@@ -100,22 +101,22 @@ public class BikeAPIController : ControllerBase
                 return NotFound();
             }
 
-            // Get the number of journeys starting from this station
+            // get the number of journeys starting from this station
             //var departureStationCount = await _context.Journeys.CountAsync(j => j.Departure_station_id == data.Id);
             var departureStationCount = await _context.Journeys.CountAsync(j => j.Departure_station_name == data.Name);
 
-            // Get the number of journeys ending to this station
+            // get the number of journeys ending to this station
             //var returnStationCount = await _context.Journeys.CountAsync(j => j.Return_station_id == data.Id);
             var returnStationCount = await _context.Journeys.CountAsync(j => j.Return_station_name == data.Name);
 
-            // Calculate the average distance (in km) for journeys starting from this station
+            // calculate the average distance (in km) for journeys starting from this station
             var avgDepartureDistance = await _context.Journeys
                 //.Where(j => j.Departure_station_id == data.Id)
                 .Where(j => j.Departure_station_name == data.Name)
                 .Select(j => (double?)j.Covered_distance_m)
                 .AverageAsync() ?? 0.0;
 
-            // Calculate the average distance (in km) for journeys ending to this station
+            // calculate the average distance (in km) for journeys ending to this station
             var avgReturnDistance = await _context.Journeys
                 //.Where(j => j.Return_station_id == data.Id)
                 .Where(j => j.Return_station_name == data.Name)
@@ -131,7 +132,7 @@ public class BikeAPIController : ControllerBase
                 {
                     ReturnStationId = g.Key.Return_station_id,
                     ReturnStationName = g.Key.Return_station_name,
-                    ReturnStationCordinate = _context.Stations
+                    ReturnStationCoordinate = _context.Stations
                         .Where(s => s.Fid == g.Key.Return_station_id)
                         .Select(s => new { s.X, s.Y })
                         .FirstOrDefault(),
@@ -150,7 +151,7 @@ public class BikeAPIController : ControllerBase
                 {
                     DepartureStationId = g.Key.Departure_station_id,
                     DepartureStationName = g.Key.Departure_station_name,
-                    DepratureStationCordinate = _context.Stations
+                    DepartureStationCoordinate = _context.Stations
                         .Where(s => s.Fid == g.Key.Departure_station_id)
                         .Select(s => new { s.X, s.Y })
                         .FirstOrDefault(),
@@ -160,7 +161,7 @@ public class BikeAPIController : ControllerBase
                 .Take(5)
                 .ToListAsync();
 
-            // Return station info and statistics
+            // returns station info and statistics
             return Ok(new
             {
                 success = true,
@@ -181,7 +182,9 @@ public class BikeAPIController : ControllerBase
     }
 
     //POST: /api/stations
-    // Adds a new station to the database
+    // adds a new station to the database
+    // roles = "User,Admin" means: token must contain EITHER the User OR Admin role claim
+    [Authorize(Roles = "User,Admin")]
     [HttpPost("stations")]
     public async Task<ActionResult<Station>> AddStation([FromBody] Station newStation)
     {
@@ -197,13 +200,15 @@ public class BikeAPIController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error occurred while adding a new journey");
+            _logger.LogError(ex, "Error occurred while adding a new station");
             return StatusCode(500, new { error = "An error occurred while processing your request" });
         }
     }
 
     // DELETE: /api/stations/{id}
-    // Deletes a station by ID
+    // deletes a station by ID
+    // only users with the Admin role claim in their token can call this
+    [Authorize(Roles = "Admin")]
     [HttpDelete("station/{id}")]
     public async Task<IActionResult> DeleteStation(int id)
     {
@@ -226,7 +231,7 @@ public class BikeAPIController : ControllerBase
     }
 
     //GET: /api/journey/{id}
-    // Returns detailed information about a single journey
+    // returns detailed information about a single journey
     [HttpGet("station-data/{id}")]
     public async Task<ActionResult<IEnumerable<Station>>> GetStationData(int id)
     {
@@ -250,7 +255,7 @@ public class BikeAPIController : ControllerBase
     }
 
     //GET: /api/jorneys
-    // Returns a paginated list of journeys, with optional search and sorting
+    // returns a paginated list of journeys, with optional search and sorting
     [HttpGet("journeys")]
     public async Task<ActionResult<IEnumerable<Journey>>> GetJourneys(
         int? page, string search = "", string sortField = "", string sortOrder = "")
@@ -269,39 +274,28 @@ public class BikeAPIController : ControllerBase
 
             if (!string.IsNullOrEmpty(sortField))
             {
-                switch (sortField.ToLower())
+                query = sortField.ToLower() switch
                 {
-                    // Apply sorting based on the requested field and order
-                    case "departure_station_id":
-                        query = sortOrder == "asc"
+                    // apply sorting based on the requested field and order
+                    "departure_station_id" => sortOrder == "asc"
                             ? query.OrderBy(j => j.Departure_station_id)
-                            : query.OrderByDescending(j => j.Departure_station_id);
-                        break;
-                    case "departure_station_name":
-                        query = sortOrder == "asc"
+                            : query.OrderByDescending(j => j.Departure_station_id),
+                    "departure_station_name" => sortOrder == "asc"
                             ? query.OrderBy(j => j.Departure_station_name)
-                            : query.OrderByDescending(j => j.Departure_station_name);
-                        break;
-                    case "return_station_name":
-                        query = sortOrder == "asc"
+                            : query.OrderByDescending(j => j.Departure_station_name),
+                    "return_station_name" => sortOrder == "asc"
                             ? query.OrderBy(j => j.Return_station_name)
-                            : query.OrderByDescending(j => j.Return_station_name);
-                        break;
-                    case "covered_distance_m":
-                        query = sortOrder == "asc"
+                            : query.OrderByDescending(j => j.Return_station_name),
+                    "covered_distance_m" => sortOrder == "asc"
                             ? query.OrderBy(j => j.Covered_distance_m)
-                            : query.OrderByDescending(j => j.Covered_distance_m);
-                        break;
-                    case "duration_sec":
-                        query = sortOrder == "asc"
+                            : query.OrderByDescending(j => j.Covered_distance_m),
+                    "duration_sec" => sortOrder == "asc"
                             ? query.OrderBy(j => j.Duration_sec)
-                            : query.OrderByDescending(j => j.Duration_sec);
-                        break;
-                    default:
-                        // Default sorting if unknown field
-                        query = query.OrderBy(j => j.Id);
-                        break;
-                }
+                            : query.OrderByDescending(j => j.Duration_sec),
+
+                    // default sorting if unknown field
+                    _ => query.OrderBy(j => j.Id)
+                };
 
                 var data = await query
                     .Skip((currentPage - 1) * pageSize)
@@ -318,7 +312,7 @@ public class BikeAPIController : ControllerBase
             }
             else if (string.IsNullOrEmpty(search))
             {
-                // No search: return paginated journeys
+                // no search: return paginated journeys
                 var data = await query
                     .Skip((currentPage - 1) * pageSize)
                     .Take(pageSize)
@@ -334,13 +328,10 @@ public class BikeAPIController : ControllerBase
             }
             else
             {
-                // Search: return journeys where departure station name contains the search string
+                // search: return journeys where departure station name contains the search string
                 var filteredQuery = query
                     .Where(journey => journey.Departure_station_name != null &&
-                                      journey.Departure_station_name.ToLower().Contains(search));
-                //.Skip((currentPage - 1) * pageSize)
-                //.Take(pageSize)
-                //.ToListAsync();
+                            journey.Departure_station_name.ToLower().Contains(search));
 
                 var totalItems = await filteredQuery.CountAsync();
 
@@ -366,7 +357,7 @@ public class BikeAPIController : ControllerBase
     }
 
     //GET: /api/journey/{id}
-    // Returns detailed information about a single journey
+    // returns detailed information about a single journey
     [HttpGet("journey/{id}")]
     public async Task<ActionResult<IEnumerable<Journey>>> GetJourney(int id)
     {
@@ -390,7 +381,8 @@ public class BikeAPIController : ControllerBase
     }
 
     //POST: /api/journeys
-    // Adds a new journey to the database
+    // adds a new journey to the database
+    [Authorize(Roles = "User,Admin")]
     [HttpPost("journeys")]
     public async Task<ActionResult<Journey>> AddJourney([FromBody] Journey newJourney)
     {
@@ -412,7 +404,8 @@ public class BikeAPIController : ControllerBase
     }
 
     // DELETE: /api/journey/{id}
-    // Deletes a journey by ID
+    // deletes a journey by ID
+    [Authorize(Roles = "Admin")]
     [HttpDelete("journey/{id}")]
     public async Task<IActionResult> DeleteJourney(int id)
     {
