@@ -32,7 +32,7 @@ public class BikeAPIController : ControllerBase
             int currentPage = page ?? 1;
             if (pageSize < 40) pageSize = 40;
 
-            IQueryable<Station> query = _context.Stations;
+            IQueryable<Station> query = _context.Stations.AsNoTracking().OrderBy(station => station.Fid); // default sorting by ID
 
             search = search.ToLower();
 
