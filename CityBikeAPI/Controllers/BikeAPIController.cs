@@ -93,7 +93,7 @@ public class BikeAPIController : ControllerBase
     {
         try
         {
-            IQueryable<Station> query = _context.Stations;
+            IQueryable<Journey> query = _context.Journeys;
             var data = await _context.Stations.FindAsync(id);
 
             if (data == null)
@@ -103,28 +103,28 @@ public class BikeAPIController : ControllerBase
 
             // get the number of journeys starting from this station
             //var departureStationCount = await _context.Journeys.CountAsync(j => j.Departure_station_id == data.Id);
-            var departureStationCount = await _context.Journeys.CountAsync(j => j.Departure_station_name == data.Name);
+            var departureStationCount = await query.CountAsync(j => j.Departure_station_name == data.Name);
 
             // get the number of journeys ending to this station
             //var returnStationCount = await _context.Journeys.CountAsync(j => j.Return_station_id == data.Id);
-            var returnStationCount = await _context.Journeys.CountAsync(j => j.Return_station_name == data.Name);
+            var returnStationCount = await query.CountAsync(j => j.Return_station_name == data.Name);
 
             // calculate the average distance (in km) for journeys starting from this station
-            var avgDepartureDistance = await _context.Journeys
+            var avgDepartureDistance = await query
                 //.Where(j => j.Departure_station_id == data.Id)
                 .Where(j => j.Departure_station_name == data.Name)
                 .Select(j => (double?)j.Covered_distance_m)
                 .AverageAsync() ?? 0.0;
 
             // calculate the average distance (in km) for journeys ending to this station
-            var avgReturnDistance = await _context.Journeys
+            var avgReturnDistance = await query
                 //.Where(j => j.Return_station_id == data.Id)
                 .Where(j => j.Return_station_name == data.Name)
                 .Select(j => (double?)j.Covered_distance_m)
                 .AverageAsync() ?? 0.0;
 
             // calculate and sort 5 most popular return stations for journeys starting from the station
-            var popularReturnStations = await _context.Journeys
+            var popularReturnStations = await query
                 //.Where(j => j.Departure_station_id == data.Id && j.Return_station_name != null)
                 .Where(j => j.Departure_station_name == data.Name && j.Return_station_name != null)
                 .GroupBy(j => new { j.Return_station_id, j.Return_station_name })
@@ -143,7 +143,7 @@ public class BikeAPIController : ControllerBase
                 .ToListAsync();
 
             // calculate and sort 5 most popular departure stations for journeys ending at the station
-            var popularDepartureStations = await _context.Journeys
+            var popularDepartureStations = await query
                 //.Where(j => j.Return_station_id == data.Id && j.Departure_station_name != null)
                 .Where(j => j.Return_station_name == data.Name && j.Departure_station_name != null)
                 .GroupBy(j => new { j.Departure_station_id, j.Departure_station_name })
@@ -262,92 +262,55 @@ public class BikeAPIController : ControllerBase
     {
         try
         {
-            int pageSize = 40;
-            int currentPage = page ?? 1;
-            if (pageSize < 40) pageSize = 40;
+            const int pageSize = 40;
+            int currentPage = page.GetValueOrDefault(1);
+            if (currentPage < 1) currentPage = 1;
 
-            IQueryable<Journey> query = _context.Journeys;
+            IQueryable<Journey> query = _context.Journeys.AsNoTracking().OrderBy(j => j.Id); // default sorting by ID
 
-            search = search.ToLower();
+            if (!string.IsNullOrEmpty(search))
+            {
+                string trimmedSearch = search.Trim();
+                query = query.Where(journey => journey.Departure_station_name != null
+                    && EF.Functions.ILike(journey.Departure_station_name, $"%{trimmedSearch}%"));
+            }
+
+            bool isAcending = string.Equals(sortOrder, "asc", StringComparison.OrdinalIgnoreCase);
+
+            query = sortField?.ToLowerInvariant() switch
+            {
+                "departure_station_id" => isAcending
+                    ? query.OrderBy(j => j.Departure_station_id)
+                    : query.OrderByDescending(j => j.Departure_station_id),
+                "departure_station_name" => isAcending
+                    ? query.OrderBy(j => j.Departure_station_name)
+                    : query.OrderByDescending(j => j.Departure_station_name),
+                "return_station_name" => isAcending
+                    ? query.OrderBy(j => j.Return_station_name)
+                    : query.OrderByDescending(j => j.Return_station_name),
+                "covered_distance_m" => isAcending
+                    ? query.OrderBy(j => j.Covered_distance_m)
+                    : query.OrderByDescending(j => j.Covered_distance_m),
+                "duration_sec" => isAcending
+                    ? query.OrderBy(j => j.Duration_sec)
+                    : query.OrderByDescending(j => j.Duration_sec),
+                _ => query.OrderBy(j => j.Id) // Default sorting by ID
+            };
 
             var totalCount = await query.CountAsync();
 
-            if (!string.IsNullOrEmpty(sortField))
+            var data = await query
+                .Skip((currentPage - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return Ok(new
             {
-                query = sortField.ToLower() switch
-                {
-                    // apply sorting based on the requested field and order
-                    "departure_station_id" => sortOrder == "asc"
-                            ? query.OrderBy(j => j.Departure_station_id)
-                            : query.OrderByDescending(j => j.Departure_station_id),
-                    "departure_station_name" => sortOrder == "asc"
-                            ? query.OrderBy(j => j.Departure_station_name)
-                            : query.OrderByDescending(j => j.Departure_station_name),
-                    "return_station_name" => sortOrder == "asc"
-                            ? query.OrderBy(j => j.Return_station_name)
-                            : query.OrderByDescending(j => j.Return_station_name),
-                    "covered_distance_m" => sortOrder == "asc"
-                            ? query.OrderBy(j => j.Covered_distance_m)
-                            : query.OrderByDescending(j => j.Covered_distance_m),
-                    "duration_sec" => sortOrder == "asc"
-                            ? query.OrderBy(j => j.Duration_sec)
-                            : query.OrderByDescending(j => j.Duration_sec),
-
-                    // default sorting if unknown field
-                    _ => query.OrderBy(j => j.Id)
-                };
-
-                var data = await query
-                    .Skip((currentPage - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToListAsync();
-
-                return Ok(new
-                {
-                    currentPage,
-                    pageSize,
-                    totalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
-                    data
-                });
-            }
-            else if (string.IsNullOrEmpty(search))
-            {
-                // no search: return paginated journeys
-                var data = await query
-                    .Skip((currentPage - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToListAsync();
-
-                return Ok(new
-                {
-                    currentPage,
-                    pageSize,
-                    totalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
-                    data
-                });
-            }
-            else
-            {
-                // search: return journeys where departure station name contains the search string
-                var filteredQuery = query
-                    .Where(journey => journey.Departure_station_name != null &&
-                            journey.Departure_station_name.ToLower().Contains(search));
-
-                var totalItems = await filteredQuery.CountAsync();
-
-                var data = await filteredQuery
-                    .Skip((currentPage - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToListAsync();
-
-                return Ok(new
-                {
-                    currentPage,
-                    pageSize,
-                    totalPages = (int)Math.Ceiling(totalItems / (double)pageSize),
-                    data
-                });
-            }
+                currentPage,
+                pageSize,
+                totalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+                data
+            });
         }
         catch (Exception ex)
         {
