@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { ChangeEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Station } from '../types';
 import { RootState } from '../store';
 
@@ -28,6 +28,7 @@ interface Props {
 
 const SearchedStationsData = ({ stations, handlePageChange }: Props) => {
   const isLoading = useSelector(({ loading }: RootState) => loading); // loading state for handling loading image
+  const navigate = useNavigate();
 
   // array of objects for table cell
   const headCell = [
@@ -51,7 +52,7 @@ const SearchedStationsData = ({ stations, handlePageChange }: Props) => {
   return (
     <div>
       {!isLoading && stations.data ? (
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} elevation={0}>
           <Table>
             <TableHead>
               <TableRow sx={{ boxShadow: 4 }}>
@@ -68,10 +69,14 @@ const SearchedStationsData = ({ stations, handlePageChange }: Props) => {
             </TableHead>
             <TableBody>
               {stations.data.map((station) => (
-                <TableRow key={station.id} sx={{ boxShadow: 4 }}>
-                  <TableCell className="row">
-                    <Link to={`/station/${station.id}`}>{station.name}</Link>
-                  </TableCell>
+                <TableRow
+                  key={station.id}
+                  onClick={() => navigate(`/station/${station.id}`)}
+                  tabIndex={0}
+                  role="link"
+                  sx={{ cursor: 'pointer' }}
+                >
+                  <TableCell>{station.name}</TableCell>
                   <TableCell align="right">
                     {station.address} {station.town}
                   </TableCell>

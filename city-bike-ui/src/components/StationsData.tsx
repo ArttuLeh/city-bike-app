@@ -90,13 +90,7 @@ const StationData = ({ stations, handlePageChange }: Props) => {
           <CircularProgress />
         </Box>
       )}
-      <Stack
-        spacing={3}
-        sx={{
-          paddingTop: 2,
-          paddingBottom: 2,
-        }}
-      >
+      <Stack spacing={3} sx={{ paddingTop: 2, paddingBottom: 2 }}>
         <Pagination
           sx={{ display: 'flex', justifyContent: 'center' }}
           count={stations.totalPages}

@@ -34,50 +34,27 @@ public class BikeAPIController : ControllerBase
 
             IQueryable<Station> query = _context.Stations.AsNoTracking().OrderBy(station => station.Fid); // default sorting by ID
 
-            search = search.ToLower();
+            if (!string.IsNullOrEmpty(search))
+            {
+                string trimmedSearch = search.Trim();
+                query = query.Where(station => station.Name != null
+                && EF.Functions.ILike(station.Name, $"%{trimmedSearch}%"));
+            }
 
             var totalCount = await query.CountAsync();
 
-            if (string.IsNullOrEmpty(search))
+            var data = await query
+                .Skip((currentPage - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return Ok(new
             {
-                // no search: return paginated stations
-                var data = await query
-                    .OrderBy(station => station.Fid) // Default sorting by ID
-                    .Skip((currentPage - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToListAsync();
-
-                return Ok(new
-                {
-                    currentPage,
-                    pageSize,
-                    totalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
-                    data
-                });
-            }
-            else
-            {
-                // search: return all stations whose name contains the search string
-                var filteredQuery = query
-                    .Where(station => station.Name != null && station.Name.ToLower().Contains(search));
-                //.ToListAsync();
-
-                var totalItems = await filteredQuery.CountAsync();
-
-                var data = await filteredQuery
-                    .OrderBy(station => station.Fid) // Default sorting by ID
-                    .Skip((currentPage - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToListAsync();
-
-                return Ok(new
-                {
-                    currentPage,
-                    pageSize,
-                    totalPages = (int)Math.Ceiling(totalItems / (double)pageSize),
-                    data
-                });
-            }
+                currentPage,
+                pageSize,
+                totalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+                data
+            });
         }
         catch (Exception ex)
         {
