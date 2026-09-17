@@ -59,6 +59,8 @@ const JourneysList = () => {
       return (
         <SearchedJourneysData
           journeys={journeys ?? { data: [], totalPages: 0 }}
+          sortOrder={sortOrder}
+          sortField={sortField}
           handleSort={handleSort}
           handlePageChange={handlePageChange}
         />
