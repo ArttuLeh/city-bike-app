@@ -252,23 +252,23 @@ public class BikeAPIController : ControllerBase
                     && EF.Functions.ILike(journey.Departure_station_name, $"%{trimmedSearch}%"));
             }
 
-            bool isAcending = string.Equals(sortOrder, "asc", StringComparison.OrdinalIgnoreCase);
+            bool isAscending = string.Equals(sortOrder, "asc", StringComparison.OrdinalIgnoreCase);
 
             query = sortField?.ToLowerInvariant() switch
             {
-                "departure_station_id" => isAcending
+                "departure_station_id" => isAscending
                     ? query.OrderBy(j => j.Departure_station_id)
                     : query.OrderByDescending(j => j.Departure_station_id),
-                "departure_station_name" => isAcending
+                "departure_station_name" => isAscending
                     ? query.OrderBy(j => j.Departure_station_name)
                     : query.OrderByDescending(j => j.Departure_station_name),
-                "return_station_name" => isAcending
+                "return_station_name" => isAscending
                     ? query.OrderBy(j => j.Return_station_name)
                     : query.OrderByDescending(j => j.Return_station_name),
-                "covered_distance_m" => isAcending
+                "covered_distance_m" => isAscending
                     ? query.OrderBy(j => j.Covered_distance_m)
                     : query.OrderByDescending(j => j.Covered_distance_m),
-                "duration_sec" => isAcending
+                "duration_sec" => isAscending
                     ? query.OrderBy(j => j.Duration_sec)
                     : query.OrderByDescending(j => j.Duration_sec),
                 _ => query.OrderBy(j => j.Id) // Default sorting by ID
