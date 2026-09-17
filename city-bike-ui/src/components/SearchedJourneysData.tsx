@@ -10,6 +10,7 @@ import {
   Pagination,
   Box,
   CircularProgress,
+  TableSortLabel,
 } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { ChangeEvent } from 'react';
@@ -22,13 +23,21 @@ interface Props {
     totalPages: number;
     success?: boolean;
   };
+  sortOrder: string;
+  sortField: string;
+  loading?: boolean;
   handlePageChange: (event: ChangeEvent<unknown>, value: number) => void;
   handleSort: (value: string) => void;
-  loading?: boolean;
 }
 
 //component that show the searched data
-const SearchedJourneysData = ({ journeys, handlePageChange }: Props) => {
+const SearchedJourneysData = ({
+  journeys,
+  sortOrder,
+  sortField,
+  handleSort,
+  handlePageChange,
+}: Props) => {
   const isLoading = useSelector(({ loading }: RootState) => loading); // loading state for handling loading image
 
   // array of objects for table cell
@@ -73,7 +82,13 @@ const SearchedJourneysData = ({ journeys, handlePageChange }: Props) => {
                     sx={{ fontWeight: 'bold' }}
                     align={headCell.numeric ? 'right' : 'left'}
                   >
-                    {headCell.label}
+                    <TableSortLabel
+                      active={sortField === headCell.id}
+                      direction={sortOrder === 'asc' ? 'asc' : 'desc'}
+                      onClick={() => handleSort(headCell.id)}
+                    >
+                      {headCell.label}
+                    </TableSortLabel>
                   </TableCell>
                 ))}
               </TableRow>
