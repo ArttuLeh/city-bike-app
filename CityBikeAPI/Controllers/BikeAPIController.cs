@@ -24,7 +24,7 @@ public class BikeAPIController : ControllerBase
     //GET: /api/stations
     // returns a paginated list of stations, with optional search by name
     [HttpGet("stations")]
-    public async Task<ActionResult<IEnumerable<Station>>> GetStations(int? page, string search = "")
+    public async Task<ActionResult<PagedResult<Station>>> GetStations(int? page, string search = "")
     {
         try
         {
@@ -48,12 +48,12 @@ public class BikeAPIController : ControllerBase
                 .Take(pageSize)
                 .ToListAsync();
 
-            return Ok(new
+            return Ok(new PagedResult<Station>
             {
-                currentPage,
-                pageSize,
-                totalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
-                data
+                Data = data,
+                TotalCount = totalCount,
+                PageSize = pageSize,
+                CurrentPage = currentPage
             });
         }
         catch (Exception ex)
@@ -234,7 +234,7 @@ public class BikeAPIController : ControllerBase
     //GET: /api/jorneys
     // returns a paginated list of journeys, with optional search and sorting
     [HttpGet("journeys")]
-    public async Task<ActionResult<IEnumerable<Journey>>> GetJourneys(
+    public async Task<ActionResult<PagedResult<Journey>>> GetJourneys(
         int? page, string search = "", string sortField = "", string sortOrder = "")
     {
         try
@@ -281,12 +281,12 @@ public class BikeAPIController : ControllerBase
                 .Take(pageSize)
                 .ToListAsync();
 
-            return Ok(new
+            return Ok(new PagedResult<Journey>
             {
-                currentPage,
-                pageSize,
-                totalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
-                data
+                Data = data,
+                TotalCount = totalCount,
+                PageSize = pageSize,
+                CurrentPage = currentPage
             });
         }
         catch (Exception ex)
