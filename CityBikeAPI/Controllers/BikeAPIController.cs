@@ -214,7 +214,7 @@ public class BikeAPIController : ControllerBase
     {
         try
         {
-            IQueryable<Station> query = _context.Stations;
+            //IQueryable<Station> query = _context.Stations;
             var data = await _context.Stations.FindAsync(id);
 
             if (data == null)
