@@ -303,7 +303,7 @@ public class BikeAPIController : ControllerBase
     {
         try
         {
-            IQueryable<Journey> query = _context.Journeys;
+            //IQueryable<Journey> query = _context.Journeys;
             var data = await _context.Journeys.FindAsync(id);
 
             if (data == null)
