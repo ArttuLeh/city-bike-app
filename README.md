@@ -25,14 +25,14 @@ Built with ASP.NET Core Web API (backend) and React + TypeScript (frontend).
 ## Screenshots
 
 Stations view
-<img width="800" height="640" alt="Stations" src="https://github.com/user-attachments/assets/37728369-663e-4b31-8fb9-f4cf2f240f3e" />
+<img width="640" height="480" alt="Stations" src="https://github.com/user-attachments/assets/37728369-663e-4b31-8fb9-f4cf2f240f3e" />
 
 Journeys view
-<img width="800" height="640" alt="Journeys" src="https://github.com/user-attachments/assets/30606c70-87c4-45c0-9cea-d5e353230612" />
+<img width="640" height="480" alt="Journeys" src="https://github.com/user-attachments/assets/30606c70-87c4-45c0-9cea-d5e353230612" />
 
 Selected station view
-<img width="800" height="640" alt="Station-data" src="https://github.com/user-attachments/assets/c3015ffb-e349-49a2-8951-c7c46ee27346" />
-<img width="800" height="640" alt="Station-map" src="https://github.com/user-attachments/assets/7f58eff5-b0bc-46f8-984e-c54270fdd0a6" />
+<img width="640" height="480" alt="Station-data" src="https://github.com/user-attachments/assets/c3015ffb-e349-49a2-8951-c7c46ee27346" />
+<img width="640" height="480" alt="Station-map" src="https://github.com/user-attachments/assets/7f58eff5-b0bc-46f8-984e-c54270fdd0a6" />
 
 ## Getting Started
 
